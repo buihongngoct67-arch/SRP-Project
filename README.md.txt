@@ -1,1 +1,2 @@
 Hello 
+Hi, Kuno-sensei
