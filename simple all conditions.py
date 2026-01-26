@@ -18,23 +18,13 @@ specific_genes = gene_counts[gene_counts <= 3].index
 result_table = uberon_df[uberon_df['Gene name'].isin(specific_genes)]
 final_table = result_table[['Gene name', 'Anatomical entity name', 'Sex', 'Developmental stage name', 'Anatomical entity ID']]
 print(final_table)
+final_table.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\filtered_genes_table.xlsx', index=False)
+
 
 child_ID = result_table['Anatomical entity ID'].unique()
-import obonet
-obo_path = r"C:\Users\DELL\Documents\GitHub\SRP-Project\uberon.obo"
-uberon_ontology = obonet.read_obo(obo_path)
+print(child_ID)
 
-
-term = "UBERON:0002107"
-term in uberon_ontology
-list(uberon_ontology.keys())[:10]
-
-# parent_id should be parents of "term": "digestive system" and "anatomical system"
-
-parent_ID = [node 
-               for node in uberon_ontology.nodes() 
-               if ("UBERON:0000467", node) in uberon_ontology.edges()
-               and uberon_ontology.edges[("UBERON:0000467", node)].get("relation") == "part_of"]
-
-print(parent_ID)
-                                uberon_ontology[term]
+from collections import defaultdict
+import networkx as nx
+__all__ = ["dfs_edges", "dfs_tree", "dfs_predecessors", "dfs_successors", "descendants", "ancestors"]
+def dfs_predecessors(G, source=None, depth_limit=None, )
