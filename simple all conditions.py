@@ -20,11 +20,50 @@ final_table = result_table[['Gene name', 'Anatomical entity name', 'Sex', 'Devel
 print(final_table)
 final_table.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\filtered_genes_table.xlsx', index=False)
 
+test_column_table = result_table[['Gene ID', 'Gene name', 'Anatomical entity ID',
+       'Anatomical entity name', 'Developmental stage ID',
+       'Developmental stage name', 'Sex', 'Strain', 'Expression',
+       'Call quality', 'FDR', 'Expression score', 'Expression rank']]
+print(test_column_table.head())
+test_column_table.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\test_column_table.xlsx', index=False)
+
 
 child_ID = result_table['Anatomical entity ID'].unique()
 print(child_ID)
 
-from collections import defaultdict
 import networkx as nx
-__all__ = ["dfs_edges", "dfs_tree", "dfs_predecessors", "dfs_successors", "descendants", "ancestors"]
-def dfs_predecessors(G, source=None, depth_limit=None, )
+
+obo_file_path = r"C:\Users\DELL\Documents\GitHub\SRP-Project\uberon.obo"
+
+def parse_obo_to_networkx(obo_file_path):
+    G = nx.DiGraph()
+    current_id = None
+    with open(obo_file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            line = line.strip()
+            if line == '[Term]':
+                current_id = None
+            elif line.startswith('id:'):
+                current_id = line.split('id:')[1].strip()
+                G.add_node(current_id)
+            elif line.startswith('is_a:') and current_id in child_ID:
+                parent_id = line.split('is_a:')[1].split('!')[0].strip()
+                G.add_edge(parent_id, current_id)
+            elif line.startswith("relationship: part_of") and current_id in child_ID:
+                parent_id = line.split("relationship: part_of")[1].split('!')[0].strip()
+                G.add_edge(parent_id, current_id)
+    return G
+
+def graph_to_parent_child_table(G):
+    data = []
+    for parent, child in G.edges():
+        data.append({'Child': child, 'Parent': parent})
+    return pd.DataFrame(data)
+
+G = parse_obo_to_networkx(obo_file_path)
+df = graph_to_parent_child_table(G)
+print(df.head())
+
+        
+
+
