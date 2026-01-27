@@ -65,6 +65,28 @@ df = graph_to_parent_child_table(G)
 print(df.head())
 print(df)
 
-        
+def get_id_to_name_mapping(obo_file_path):
+    id_name_map = {}
+    current_id = None
+    with open(obo_file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            line = line.strip()
+            if line.startswith('id: '):
+                current_id = line.split('id:')[1].strip()
+            elif line.startswith('name: ') and current_id:
+                name = line.split('name: ')[1].strip()
+                id_name_map[current_id] = name
+    return id_name_map
+mapping_name = get_id_to_name_mapping(obo_file_path)
+
+df_final = df[df['Child'].str.startswith('UBERON') & df['Parent'].str.startswith('UBERON')].copy()
+df_final['Child_Name'] = df_final['Child'].map(mapping_name)
+df_final['Parent_Name'] = df_final['Parent'].map(mapping_name)
+
+print(df_final.head())
+
+table_for_heatmap = df_final[['Child_Name', 'Parent_Name']].copy()
+table_for_heatmap.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\parent_child_table.xlsx', index=False)
+
 
 
