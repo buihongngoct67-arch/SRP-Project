@@ -63,6 +63,7 @@ def graph_to_parent_child_table(G):
 G = parse_obo_to_networkx(obo_file_path)
 df = graph_to_parent_child_table(G)
 print(df.head())
+print(df)
 
         
 
