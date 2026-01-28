@@ -62,6 +62,7 @@ def graph_to_parent_child_table(G):
 
 G = parse_obo_to_networkx(obo_file_path)
 df = graph_to_parent_child_table(G)
+
 print(df.head())
 print(df)
 
@@ -77,16 +78,34 @@ def get_id_to_name_mapping(obo_file_path):
                 name = line.split('name: ')[1].strip()
                 id_name_map[current_id] = name
     return id_name_map
+
 mapping_name = get_id_to_name_mapping(obo_file_path)
+df['Child_Name'] = df['Child'].map(mapping_name)
+df['Parent_Name'] = df['Parent'].map(mapping_name)
 
-df_final = df[df['Child'].str.startswith('UBERON') & df['Parent'].str.startswith('UBERON')].copy()
-df_final['Child_Name'] = df_final['Child'].map(mapping_name)
-df_final['Parent_Name'] = df_final['Parent'].map(mapping_name)
+print(df.head())
 
-print(df_final.head())
+print(final_table[['Gene name', 'Anatomical entity ID']])
 
-table_for_heatmap = df_final[['Child_Name', 'Parent_Name']].copy()
-table_for_heatmap.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\parent_child_table.xlsx', index=False)
+parent_child_table_df = final_table.merge(df, left_on='Anatomical entity ID', right_on='Child', how='left')
+parent_child_table_df['value'] = 1
+print(parent_child_table_df.head())
+parent_child_table_df.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\parent_child_table.xlsx', index=False)
+
+heatmap_df = parent_child_table_df.pivot_table(index='Gene name', columns='Parent_Name', values='value', aggfunc='max', fill_value=0)
+print(heatmap_df.head())
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.figure(figsize=(12, 8))
+sns.heatmap(heatmap_df, cmap='Blues', linewidths=0.5, cbar_kws={'label': 'Presence'})
+plt.title('Overexpression Heatmap of Genes across Anatomical Entities')
+plt.xlabel('Anatomical Entity')
+plt.ylabel('Gene Name')
+plt.tight_layout()
+plt.show()
+
+
 
 
 
