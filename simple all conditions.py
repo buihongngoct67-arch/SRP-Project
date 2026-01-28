@@ -1,5 +1,8 @@
 import pandas as pd
 from pathlib import Path
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 path = r"C:\Users\DELL\Documents\GitHub\SRP-Project\data\Mus musculus practice.tsv"
 Path(path).exists()
 mus_musculus_df = pd.read_csv(path, sep="\t")
@@ -92,16 +95,22 @@ parent_child_table_df['value'] = 1
 print(parent_child_table_df.head())
 parent_child_table_df.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\parent_child_table.xlsx', index=False)
 
-heatmap_df = parent_child_table_df.pivot_table(index='Gene name', columns='Parent_Name', values='value', aggfunc='max', fill_value=0)
-print(heatmap_df.head())
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-plt.figure(figsize=(12, 8))
-sns.heatmap(heatmap_df, cmap='Blues', linewidths=0.5, cbar_kws={'label': 'Presence'})
-plt.title('Overexpression Heatmap of Genes across Anatomical Entities')
-plt.xlabel('Anatomical Entity')
-plt.ylabel('Gene Name')
+gene_of_interest = "Awat1"
+
+one_gene_df = table_for_heatmap_df[table_for_heatmap_df['Gene name'] == gene_of_interest].copy()
+one_gene_df['value'] = 1 
+
+heatmap_df = one_gene_df.pivot_table(index='Gene name', columns='Parent_Name', values='Expression', aggfunc='max').fillna(0)
+heatmap_df (heatmap_df > 0).astype(int)
+binary_cmap = ListedColormap(["white","blue"])
+
+
+plt.figure(figsize=(14, 2))
+plt.imshow(heatmap_df.values, cmap=binary_cmap, aspect='auto', vmin=0, vmax=1)
+plt.xticks(ticks=range(len(heatmap_df.columns)), labels=heatmap_df.columns, rotation=45, ha='right')
+plt.yticks([0], [gene_of_interest])
+plt.title('Expression Overview: {genes_of_interest}')
 plt.tight_layout()
 plt.show()
 
