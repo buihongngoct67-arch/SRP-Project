@@ -95,7 +95,6 @@ parent_child_table_df['value'] = 1
 print(parent_child_table_df.head())
 parent_child_table_df.to_excel('G:\\Tsukuba\\Lab Animal Science\\ProjectPython\\parent_child_table.xlsx', index=False)
 
-
 gene_of_interest = "Awat1"
 
 one_gene_df = table_for_heatmap_df[table_for_heatmap_df['Gene name'] == gene_of_interest].copy()
@@ -108,13 +107,8 @@ binary_cmap = ListedColormap(["white","blue"])
 
 plt.figure(figsize=(14, 2))
 plt.imshow(heatmap_df.values, cmap=binary_cmap, aspect='auto', vmin=0, vmax=1)
-plt.xticks(ticks=range(len(heatmap_df.columns)), labels=heatmap_df.columns, rotation=45, ha='right')
+plt.xticks(ticks=range(len(heatmap_df.columns)), labels=heatmap_df.columns, rotation=45, ha='right', fontsize=6)
 plt.yticks([0], [gene_of_interest])
 plt.title('Expression Overview: {genes_of_interest}')
 plt.tight_layout()
 plt.show()
-
-
-
-
-
